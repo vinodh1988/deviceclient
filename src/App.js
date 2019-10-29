@@ -1,26 +1,44 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import logo from './logo.svg';
 import './App.css';
+import Request from 'superagent';
+import Device from './Device';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={device:{}};
+    this.loadDevice=this.loadDevice.bind(this);
+  }
+
+  loadDevice(){
+    console.log("Event fired")
+    let id=ReactDOM.findDOMNode(this.refs.deviceid).value;
+    Request.get("http://localhost:8888/devices/"+id).then
+    (
+      (response)=>{
+        console.log(response.body);
+        this.state.device=response.body;
+        this.setState(this.state);
+      },
+      (error)=>{
+        console.log("Error");
+        console.log(error);
+      }
+    )
+
+  }
+
+  render(){
+      return(
+        <div id="client">
+             Enter Device id<input type="text" ref="deviceid"/>
+             <button onClick={this.loadDevice}>Get Device</button>
+             <Device device={this.state.device}></Device>
+        </div>
+      )
+  }
 }
 
 export default App;
